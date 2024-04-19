@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem.XR.Haptics;
-using UnityEngine.UI;
 
 public class MiniRoomManipulator : MonoBehaviour
 {
@@ -10,7 +8,7 @@ public class MiniRoomManipulator : MonoBehaviour
     public float focusDistPastMouse = 5f; 
     
     public VecSpringDamp vecSpring;
-    private Transform _hitTransform;
+    private MiniRoomController _room;
     private Vector3 _focusPoint;
 
     private Vector3 _placeRoomPos;
@@ -31,6 +29,7 @@ public class MiniRoomManipulator : MonoBehaviour
         else
         {
             UpdateMouseFocusPoint();
+            SpinRoom();
             
             if (LeftClick())
             {
@@ -38,7 +37,7 @@ public class MiniRoomManipulator : MonoBehaviour
             }
         }
         
-        if (_hitTransform != null)
+        if (_room != null)
         {
             if (_holding)
             {
@@ -49,17 +48,17 @@ public class MiniRoomManipulator : MonoBehaviour
                 vecSpring.MoveTowards(_placeRoomPos, moveVelocity);
             }
 
-            _hitTransform.transform.position = vecSpring.Pos();
+            _room.transform.position = vecSpring.Pos();
         }
     }
 
     void CheckPickup()
     {
-        if (LeftClick() && ClickedOnMiniRoom(out Transform room))
+        if (LeftClick() && ClickedOnMiniRoom(out MiniRoomController room))
         {
-            _placeRoomPos = room.position;
+            _placeRoomPos = room.transform.position;
             Debug.Log(_placeRoomPos);
-            _hitTransform = room;
+            _room = room;
             _holding = true;
             vecSpring.Init(room.transform.position);
         }
@@ -70,17 +69,14 @@ public class MiniRoomManipulator : MonoBehaviour
         return Input.GetMouseButtonUp(0);
     }
 
-    bool ClickedOnMiniRoom(out Transform room)
+    bool ClickedOnMiniRoom(out MiniRoomController room)
     {
         room = null;
         
         Ray ray = cam.ScreenPointToRay (Input.mousePosition);
         if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, maxDistance: 100f))
         {
-            if (hit.transform.GetComponent<MiniRoomController>())
-            {
-                room = hit.transform;
-            }
+            room = hit.transform.GetComponent<MiniRoomController>();
         }
 
         return room != null;
@@ -91,8 +87,40 @@ public class MiniRoomManipulator : MonoBehaviour
         _focusPoint =
             cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, focusDistPastMouse));
     }
-
-    void Drop()
+    
+    void SpinRoom()
     {
+        // Roll
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            _room.PushRoll();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            _room.PullRoll();
+        }
+        
+        // Pitch
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            _room.PushPitch();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            _room.PullPitch();
+        }
+        
+        // Yaw
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            _room.PushYaw();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            _room.PullYaw();
+        }
     }
 }

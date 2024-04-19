@@ -7,51 +7,40 @@ public class MiniRoomController : MonoBehaviour
     private Quaternion _currentRotation = Quaternion.identity;
     private Quaternion _goalRotation = Quaternion.identity;
 
-    void Start()
-    {
-        
-    }
 
     void Update()
     {
-        ProcessUpdate();
         _currentRotation = Quaternion.Slerp(_currentRotation, _goalRotation, rotSpeed * Time.deltaTime);
         transform.rotation = _currentRotation;
     }
 
-    void ProcessUpdate()
+    public void PushPitch()
     {
-        // Roll
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            _goalRotation *= Quaternion.AngleAxis(90f, Vector3.up);
-        }
-        
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            _goalRotation *= Quaternion.AngleAxis(-90f, Vector3.up);
-        }
-        
-        // Pitch
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            _goalRotation *= Quaternion.AngleAxis(90f, Vector3.right);
-        }
-        
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            _goalRotation *= Quaternion.AngleAxis(-90f, Vector3.right);
-        }
-        
-        // Yaw
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            _goalRotation *= Quaternion.AngleAxis(90f, Vector3.forward);
-        }
-        
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            _goalRotation *= Quaternion.AngleAxis(-90f, Vector3.forward);
-        }
+        _goalRotation = Quaternion.AngleAxis(90f, Vector3.right) * _goalRotation;
+    }
+
+    public void PullPitch()
+    {
+        _goalRotation = Quaternion.AngleAxis(-90f, Vector3.right) * _goalRotation;
+    }
+
+    public void PushRoll()
+    {
+        _goalRotation = Quaternion.AngleAxis(-90f, Vector3.up) * _goalRotation;
+    }
+
+    public void PullRoll()
+    {
+        _goalRotation = Quaternion.AngleAxis(90f, Vector3.up) * _goalRotation;
+    }
+    
+    public void PushYaw()
+    {
+        _goalRotation = Quaternion.AngleAxis(90f, Vector3.forward) * _goalRotation;
+    }
+
+    public void PullYaw()
+    {
+        _goalRotation = Quaternion.AngleAxis(-90f, Vector3.forward) * _goalRotation;
     }
 }
