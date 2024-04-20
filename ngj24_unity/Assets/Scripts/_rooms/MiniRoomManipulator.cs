@@ -1,86 +1,72 @@
 using System.Collections.Generic;
+using StarterAssets;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 public class MiniRoomManipulator : MonoBehaviour
 {
+    public FirstPersonController FirstPersonController;
     public GridController GridController;
     public Camera cam;
-    public float moveVelocity = 1f;
     public float focusDistPastMouse = 5f;
     [FormerlySerializedAs("holdingOffsetWS")] public Vector3 HoldingOffsetWS = new Vector3(-5f, -5f, 0f);
     
-    public VecSpringDamp vecSpring;
     private MiniRoomController _room;
-    private Vector3 _focusPoint;
-
     private Vector3 _placeRoomPos;
-
     private bool _holding = false;
+    private bool _validPlacePos = false;
 
     public Material HighlightRenderMaterial;
+
+    void Start()
+    {
+        FirstPersonController.PickedUpCarryable += PickedUpCarryable;
+        FirstPersonController.DroppedCarryable += DroppedCarryable;
+    }
+
+    private void PickedUpCarryable(Interactable obj)
+    {
+        if (obj.TryGetComponent(out MiniRoomController miniRoom))
+        {
+            if (miniRoom.transform == GridController.PinnedRoom) return;
+            
+            _holding = true;
+            miniRoom.PickedUp();
+            miniRoom.GetComponent<Rigidbody>().isKinematic = false;
+            
+            _placeRoomPos = miniRoom.transform.position;
+            _room = miniRoom;
+        }
+    }
+
+    private void DroppedCarryable(Interactable obj)
+    {
+        if (obj.TryGetComponent(out MiniRoomController miniRoom))
+        {
+            _holding = false;
+            if (_validPlacePos)
+            {
+                miniRoom.GetComponent<Rigidbody>().isKinematic = true;
+                miniRoom.DropInPlace(_placeRoomPos);
+            }
+        }
+    }
 
     void Update()
     {
         if (!_holding)
         {
-            CheckPickup();
+
         }
         else
         {
-            UpdateMouseFocusPoint();
-            SpinRoom();
-            _placeRoomPos = FindValidSpaceToPlaceIn();
-            HighlightBestPos(_placeRoomPos);
-            
-            if (LeftClick())
+            _validPlacePos = FindValidSpaceToPlaceIn(out Vector3 placedPos);
+            if (_validPlacePos)
             {
-                _holding = false;
-            }
+                _placeRoomPos = cam.ViewportToWorldPoint(placedPos);
+                HighlightBestPos(_placeRoomPos);
+            }   
         }
-        
-        if (_room != null)
-        {
-            _room.transform.position = vecSpring.MoveTowards(_holding ? _focusPoint : _placeRoomPos, moveVelocity);
-        }
-    }
-
-    void CheckPickup()
-    {
-        if (LeftClick() && ClickedOnMiniRoom(out MiniRoomController room))
-        {
-            _placeRoomPos = room.transform.position;
-            Debug.Log(_placeRoomPos);
-            _room = room;
-            _holding = true;
-            vecSpring.Init(room.transform.position);
-        }
-    }
-
-    bool LeftClick()
-    {
-        return Input.GetMouseButtonUp(0);
-    }
-
-    bool ClickedOnMiniRoom(out MiniRoomController room)
-    {
-        room = null;
-        
-        Ray ray = cam.ScreenPointToRay (Input.mousePosition);
-        if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, maxDistance: 100f) 
-            && hit.transform != GridController.PinnedRoom
-            && hit.transform.TryGetComponent(out MiniRoomController roomController))
-        {
-            room = roomController;
-        }
-
-        return room != null;
-    }
-
-    void UpdateMouseFocusPoint()
-    {
-        _focusPoint =
-            cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, focusDistPastMouse)) + HoldingOffsetWS;
     }
 
     void HighlightBestPos(Vector3 targetPos)
@@ -90,7 +76,7 @@ public class MiniRoomManipulator : MonoBehaviour
         Graphics.RenderMesh(rp, _room.GetComponent<MeshFilter>().sharedMesh, 0, mat);
     }
 
-    Vector3 FindValidSpaceToPlaceIn()
+    bool FindValidSpaceToPlaceIn(out Vector3 bestPosVP)
     {
         List<Vector3> openPositionsWS = GridController.FindAllOpenPositions();
         List<Vector3> openPostionsVP = new List<Vector3>(openPositionsWS.Count);
@@ -105,8 +91,9 @@ public class MiniRoomManipulator : MonoBehaviour
         Vector3 mouseWP = cam.ScreenToWorldPoint(Input.mousePosition);
         
         // Setup tracking which one is best for mouse pos
+        bool foundOne = false;
         float bestDist = float.MaxValue;
-        Vector3 bestPosVP = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        bestPosVP = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
         
         for (int i = 0; i < openPositionsWS.Count; i++)
         {
@@ -114,10 +101,13 @@ public class MiniRoomManipulator : MonoBehaviour
             Vector3 openPosVP = openPostionsVP[i];
             
             Vector3 vecToTarget = openPosWS - mouseWP;
-            Ray ray = new Ray(mouseWP, vecToTarget.normalized);
+            Vector3 dirToTarget = vecToTarget.normalized;
             
+            Ray ray = new Ray(mouseWP, vecToTarget.normalized);
             float viewportDistance = Vector3.Distance(new Vector3(openPosVP.x, openPosVP.y, 0f), mouseVP);
             
+            if (vecToTarget.magnitude > 5f) continue;
+            if (Vector3.Dot(dirToTarget, FirstPersonController.transform.forward) < 0.5f) continue;
             // Check that we can ray cast without hitting anything
             if (Physics.SphereCast(ray, radius:.125f, maxDistance: vecToTarget.magnitude)) continue;
             if (!(viewportDistance < bestDist)) continue;
@@ -125,9 +115,10 @@ public class MiniRoomManipulator : MonoBehaviour
             // Store new best placements
             bestDist = viewportDistance;
             bestPosVP = openPosVP;
+            foundOne = true;
         }
 
-        return cam.ViewportToWorldPoint(bestPosVP);
+        return foundOne;
     }
     
     void SpinRoom()
