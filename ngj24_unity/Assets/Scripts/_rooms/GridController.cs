@@ -3,10 +3,19 @@ using UnityEngine;
 
 public class GridController : MonoBehaviour
 {
-    public int gridSizeMetres = 1;
-    public int maxGridSize = 5;
+    public float GridSizeMetres = 1;
+    public int MaxGridSize = 4;
+    public Vector3 ManualGridOffset;
 
     public List<MiniRoomController> MiniRooms;
+    public Transform PinnedRoom;
+
+    public bool DebugShowGrid = false;
+
+    void Start()
+    {
+        
+    }
     
     public List<Vector3> FindAllOpenPositions()
     {
@@ -18,12 +27,12 @@ public class GridController : MonoBehaviour
         {
             checkPositions.Clear();
             // Check up, down, left, right, forward, backward
-            checkPositions.Add(new Vector3(pos.x +1, pos.y, pos.z));
-            checkPositions.Add(new Vector3(pos.x -1, pos.y, pos.z));
-            checkPositions.Add(new Vector3(pos.x, pos.y+1, pos.z));
-            checkPositions.Add(new Vector3(pos.x, pos.y-1, pos.z));
-            checkPositions.Add(new Vector3(pos.x, pos.y, pos.z+1));
-            checkPositions.Add(new Vector3(pos.x, pos.y, pos.z-1));
+            checkPositions.Add(new Vector3(pos.x +GridSizeMetres, pos.y, pos.z));
+            checkPositions.Add(new Vector3(pos.x -GridSizeMetres, pos.y, pos.z));
+            checkPositions.Add(new Vector3(pos.x, pos.y+GridSizeMetres, pos.z));
+            checkPositions.Add(new Vector3(pos.x, pos.y-GridSizeMetres, pos.z));
+            checkPositions.Add(new Vector3(pos.x, pos.y, pos.z+GridSizeMetres));
+            checkPositions.Add(new Vector3(pos.x, pos.y, pos.z-GridSizeMetres));
 
             foreach (var checkPos in checkPositions)
             {
@@ -48,17 +57,18 @@ public class GridController : MonoBehaviour
     {
         List<Vector3> closedPositions = new List<Vector3>();
         
-        for (int x = -maxGridSize; x < maxGridSize; x += gridSizeMetres)
+        for (float x = -MaxGridSize; x < MaxGridSize; x += GridSizeMetres)
         {
-            for (int y = -maxGridSize; y < maxGridSize; y += gridSizeMetres)
+            for (float y = -MaxGridSize; y < MaxGridSize; y += GridSizeMetres)
             {
-                for (int z = -maxGridSize; z < maxGridSize; z += gridSizeMetres)
+                for (float z = -MaxGridSize; z < MaxGridSize; z += GridSizeMetres)
                 {
                     foreach (var miniRoom in MiniRooms)
                     {
-                        if (miniRoom.GetComponent<Collider>().bounds.Contains(new Vector3(x, y, z)))
+                        Vector3 pos = GridOffset + new Vector3(x, y, z);
+                        if (miniRoom.GetComponent<Collider>().bounds.Contains(pos))
                         {
-                            closedPositions.Add(new Vector3(x,y,z));
+                            closedPositions.Add(pos);
                         }
                     }
                 }
@@ -77,5 +87,21 @@ public class GridController : MonoBehaviour
             Gizmos.color = Color.white;
             Gizmos.DrawWireSphere(openPos, 0.1f);
         }
+
+        if (DebugShowGrid)
+        {
+            for (float x = -MaxGridSize; x < MaxGridSize; x += GridSizeMetres)
+            {
+                for (float y = -MaxGridSize; y < MaxGridSize; y += GridSizeMetres)
+                {
+                    for (float z = -MaxGridSize; z < MaxGridSize; z += GridSizeMetres)
+                    {
+                        Gizmos.DrawWireSphere(GridOffset + new Vector3(x,y,z), 0.1f);
+                    }
+                }
+            }
+        }
     }
+
+    private Vector3 GridOffset => PinnedRoom.position + ManualGridOffset;
 }

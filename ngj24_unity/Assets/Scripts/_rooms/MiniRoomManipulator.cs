@@ -67,9 +67,11 @@ public class MiniRoomManipulator : MonoBehaviour
         room = null;
         
         Ray ray = cam.ScreenPointToRay (Input.mousePosition);
-        if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, maxDistance: 100f))
+        if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, maxDistance: 100f) 
+            && hit.transform != GridController.PinnedRoom
+            && hit.transform.TryGetComponent(out MiniRoomController roomController))
         {
-            room = hit.transform.GetComponent<MiniRoomController>();
+            room = roomController;
         }
 
         return room != null;
@@ -117,7 +119,7 @@ public class MiniRoomManipulator : MonoBehaviour
             float viewportDistance = Vector3.Distance(new Vector3(openPosVP.x, openPosVP.y, 0f), mouseVP);
             
             // Check that we can ray cast without hitting anything
-            if (Physics.SphereCast(ray, radius:0.25f, maxDistance: vecToTarget.magnitude)) continue;
+            if (Physics.SphereCast(ray, radius:.125f, maxDistance: vecToTarget.magnitude)) continue;
             if (!(viewportDistance < bestDist)) continue;
             
             // Store new best placements
