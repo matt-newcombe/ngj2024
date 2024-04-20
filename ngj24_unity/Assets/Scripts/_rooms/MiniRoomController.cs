@@ -1,7 +1,4 @@
-using System;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class MiniRoomController : MonoBehaviour
 {
@@ -10,7 +7,6 @@ public class MiniRoomController : MonoBehaviour
     private Quaternion _goalRotation = Quaternion.identity;
     public VecSpringDamp vecSpring;
     public float moveVelocity = .1f;
-
 
     public bool Placed = false;
     private Vector3 _placedPosition;
@@ -44,7 +40,7 @@ public class MiniRoomController : MonoBehaviour
 
     public void StopCarry()
     {
-        IsCarrying = true;
+        IsCarrying = false;
     }
 
     public void DropInPlace(Vector3 place)
