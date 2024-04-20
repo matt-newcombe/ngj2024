@@ -47,7 +47,7 @@ public class MiniRoomManipulator : MonoBehaviour
             && _heldRoom
             && obj.transform == miniRoom.transform)
         {
-            GridController.MiniRooms.Remove(miniRoom);
+            GridController.MiniRooms.Add(miniRoom);
 
             _heldRoom = null;
             miniRoom.StopCarry();
