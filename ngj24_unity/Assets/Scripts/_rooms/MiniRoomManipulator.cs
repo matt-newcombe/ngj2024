@@ -44,9 +44,10 @@ public class MiniRoomManipulator : MonoBehaviour
 
     private void DroppedCarryable(Interactable obj)
     {
-        if (obj.TryGetComponent(out MiniRoomController miniRoom)
+        if (obj &&
+            obj.TryGetComponent(out MiniRoomController miniRoom)
             && _heldRoom
-            && obj.transform == miniRoom.transform)
+            && obj.transform == _heldRoom.transform)
         {
             GridController.MiniRooms.Add(miniRoom);
 
