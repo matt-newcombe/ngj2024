@@ -16,6 +16,7 @@ public class MiniRoomController : MonoBehaviour
     private void Start()
     {
         _currentRotation = _goalRotation = transform.rotation;
+        vecSpring.Init(transform.position);
     }
 
     void Update()

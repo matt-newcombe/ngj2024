@@ -26,9 +26,11 @@ public class Room : MonoBehaviour
             newRoomReplica.AddComponent<BoxCollider>();
 
             MiniRoomController newController = newRoomReplica.AddComponent<MiniRoomController>();
-            //newController.vecSpring.Init(newRoomReplica.transform.position);
-            //newController.vecSpring.SetHalfLife(0.5f);
-                
+
+            newController.vecSpring = new VecSpringDamp();
+            newController.vecSpring.Init(newRoomReplica.transform.position);
+            newController.vecSpring.SetHalfLife(0.5f);
+
             Interactable newInteractable = newRoomReplica.AddComponent<Interactable>();
 
             changeDetected = true;
