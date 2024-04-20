@@ -12,8 +12,10 @@ public class MiniRoomController : MonoBehaviour
     public float moveVelocity = .1f;
 
 
-    [FormerlySerializedAs("_isPlaced")] public bool Placed = false;
+    public bool Placed = false;
     private Vector3 _placedPosition;
+
+    private bool IsCarrying = false;
     
     private void Start()
     {
@@ -22,8 +24,11 @@ public class MiniRoomController : MonoBehaviour
 
     void Update()
     {
-        // _currentRotation = Quaternion.Slerp(_currentRotation, _goalRotation, rotSpeed * Time.deltaTime);
-        // transform.rotation = _currentRotation;
+        if (IsCarrying)
+        {
+            _currentRotation = Quaternion.Slerp(_currentRotation, _goalRotation, rotSpeed * Time.deltaTime);
+            transform.rotation = _currentRotation;
+        }
 
         if (Placed)
         {
@@ -31,9 +36,15 @@ public class MiniRoomController : MonoBehaviour
         }
     }
 
-    public void PickedUp()
+    public void StartCarry()
     {
         Placed = false;
+        IsCarrying = true;
+    }
+
+    public void StopCarry()
+    {
+        IsCarrying = true;
     }
 
     public void DropInPlace(Vector3 place)

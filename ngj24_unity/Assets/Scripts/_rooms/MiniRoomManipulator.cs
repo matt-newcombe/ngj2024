@@ -31,7 +31,7 @@ public class MiniRoomManipulator : MonoBehaviour
             if (miniRoom.transform == GridController.PinnedRoom) return;
             
             _holding = true;
-            miniRoom.PickedUp();
+            miniRoom.StartCarry();
             miniRoom.GetComponent<Rigidbody>().isKinematic = false;
             
             _placeRoomPos = miniRoom.transform.position;
@@ -41,9 +41,12 @@ public class MiniRoomManipulator : MonoBehaviour
 
     private void DroppedCarryable(Interactable obj)
     {
-        if (obj.TryGetComponent(out MiniRoomController miniRoom))
+        if (obj.TryGetComponent(out MiniRoomController miniRoom)
+            && _holding
+            && obj.transform == miniRoom.transform)
         {
             _holding = false;
+            miniRoom.StopCarry();
             if (_validPlacePos)
             {
                 miniRoom.GetComponent<Rigidbody>().isKinematic = true;
@@ -54,18 +57,12 @@ public class MiniRoomManipulator : MonoBehaviour
 
     void Update()
     {
-        if (!_holding)
+        if (!_holding) return;
+        _validPlacePos = FindValidSpaceToPlaceIn(out Vector3 placedPos);
+        if (_validPlacePos)
         {
-
-        }
-        else
-        {
-            _validPlacePos = FindValidSpaceToPlaceIn(out Vector3 placedPos);
-            if (_validPlacePos)
-            {
-                _placeRoomPos = cam.ViewportToWorldPoint(placedPos);
-                HighlightBestPos(_placeRoomPos);
-            }   
+            _placeRoomPos = cam.ViewportToWorldPoint(placedPos);
+            HighlightBestPos(_placeRoomPos);
         }
     }
 
