@@ -27,6 +27,14 @@ public class Door : Interactable
 
         Vector3 pos = target.position;
         Quaternion rot = target.rotation;
+
+        // If it's moved really far just teleport
+        // Matt: HACK
+        if (Vector3.Distance(door.position, pos) > 3f)
+        {
+            door.position = pos;
+            door.rotation = rot;
+        }
      
         door.position = Vector3.MoveTowards(door.position, pos, 3f * Time.deltaTime);
         door.rotation = Quaternion.RotateTowards(door.rotation, rot, 35f * Time.deltaTime);
