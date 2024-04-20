@@ -8,10 +8,17 @@ public class MiniRoomController : MonoBehaviour
     public VecSpringDamp vecSpring;
     public float moveVelocity = .1f;
 
-    public bool Placed = false;
     private Vector3 _placedPosition;
 
-    private bool IsCarrying = false;
+    public enum State
+    {
+        Loose,
+        Carrying,
+        Placing,
+        Placed
+    }
+
+    public State state = State.Loose;
     
     private void Start()
     {
@@ -21,34 +28,55 @@ public class MiniRoomController : MonoBehaviour
 
     void Update()
     {
-        if (IsCarrying)
+        switch (state)
         {
-            _currentRotation = Quaternion.Slerp(_currentRotation, _goalRotation, rotSpeed * Time.deltaTime);
-            transform.rotation = _currentRotation;
-        }
+            case State.Carrying:
+            {
+                _currentRotation = Quaternion.Slerp(_currentRotation, _goalRotation, rotSpeed * Time.deltaTime);
+                transform.rotation = _currentRotation;
+            } break;
+            case State.Placing:
+            {
+                transform.position = vecSpring.MoveTowards(_placedPosition, moveVelocity);
 
-        if (Placed)
-        {
-            transform.position = vecSpring.MoveTowards(_placedPosition, moveVelocity);
+                if (CloseToTargetPos())
+                {
+                    state = State.Placed;
+                }
+            } break;
+            case State.Placed:
+            {
+                transform.position = vecSpring.MoveTowards(_placedPosition, moveVelocity);
+            } break;
         }
     }
 
     public void StartCarry()
     {
-        Placed = false;
-        IsCarrying = true;
+        state = State.Carrying;
     }
 
     public void StopCarry()
     {
-        IsCarrying = false;
+        state = State.Loose;
     }
 
     public void DropInPlace(Vector3 place)
     {
-        Placed = true;
+        state = State.Placing;
         vecSpring.Init(transform.position);
         _placedPosition = place;
+    }
+
+    public bool IsInPlace()
+    {
+        return state == State.Placed;
+    }
+
+    private bool CloseToTargetPos()
+    {
+        float distance = Vector3.Distance(vecSpring.Pos(), _placedPosition);
+        return distance < 0.01f;
     }
 
     public void PushPitch()

@@ -30,9 +30,9 @@ public class RoomReplica : MonoBehaviour
 
             if (controller) 
             {
-                room.gameObject.SetActive(controller.Placed);
+                room.gameObject.SetActive(controller.IsInPlace());
 
-                if (!controller.Placed)
+                if (!controller.IsInPlace())
                     return;
             }
         }
