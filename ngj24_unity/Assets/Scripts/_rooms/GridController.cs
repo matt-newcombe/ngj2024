@@ -8,7 +8,7 @@ public class GridController : MonoBehaviour
 
     public List<MiniRoomController> MiniRooms;
     
-    List<Vector3> FindAllOpenPositions()
+    public List<Vector3> FindAllOpenPositions()
     {
         List<Vector3> closedPositions = FindAllClosedPositions();
         List<Vector3> openPostions = new List<Vector3>();
