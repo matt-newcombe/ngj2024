@@ -1819,13 +1819,14 @@ Transform:
   m_GameObject: {fileID: 394447806}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
-  m_LocalPosition: {x: 3.6599998, y: -6.71, z: -2.8099995}
+  m_LocalPosition: {x: 3.6599996, y: -5.96, z: -2.5599995}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1132852760}
   - {fileID: 1761974268}
   - {fileID: 83604356}
+  - {fileID: 460273218}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!43 &417202320
@@ -2339,7 +2340,7 @@ GameObject:
   - component: {fileID: 460273219}
   - component: {fileID: 460273220}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: Interactable_ReplicaRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2451,12 +2452,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 460273213}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.604, y: -12.010471, z: 1.993}
+  m_LocalRotation: {x: -0, y: -1, z: 0, w: 0.00000058114523}
+  m_LocalPosition: {x: -2.9440057, y: -6.0504713, z: -4.552996}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 394447807}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &460273219
 Rigidbody:
@@ -5412,7 +5413,7 @@ Transform:
   m_GameObject: {fileID: 1132852753}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.5, y: -5, z: 5.5}
+  m_LocalPosition: {x: 5, y: -5, z: 6.5}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7865,6 +7866,5 @@ SceneRoots:
   - {fileID: 1510205776}
   - {fileID: 1221972182}
   - {fileID: 1731144}
-  - {fileID: 460273218}
   - {fileID: 1910730465}
   - {fileID: 394447807}
