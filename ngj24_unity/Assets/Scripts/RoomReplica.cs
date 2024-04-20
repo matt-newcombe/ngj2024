@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class RoomReplica : MonoBehaviour
 {
-    public float placementScale = 20;
+    //public float placementScale = 20;
 
     [HideInInspector, SerializeField]
     public Room room;
@@ -48,7 +48,7 @@ public class RoomReplica : MonoBehaviour
             return;
 
         Vector3 localPos = pivot.InverseTransformPoint(transform.position);
-        Vector3 worldPos = pivot.TransformPoint(localPos * placementScale - pivot.localPosition);
+        Vector3 worldPos = pivot.TransformPoint(localPos * GameManager.Instance.roomPlacementScale - pivot.localPosition);
 
         room.transform.SetPositionAndRotation(worldPos, transform.rotation);
     }
