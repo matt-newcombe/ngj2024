@@ -5,7 +5,7 @@ public class Room : MonoBehaviour
 {
     public float roomSize = 30f;
     public float replicaScale = 0.05f;
-    
+
     [HideInInspector, SerializeField]
     private RoomReplica roomReplica;
 
@@ -64,10 +64,41 @@ public class Room : MonoBehaviour
         }
 
         if (changeDetected)
-            RefreshReplica();
+            CreateReplica();
     }
 
-    void RefreshReplica()
+    void CreateRelicaChildren(Transform target, Transform newParent)
+    {
+        for (int i = 0; i < target.childCount; i++)
+        {
+            Transform child = target.GetChild(i);
+
+            MeshFilter meshFilter = child.GetComponent<MeshFilter>();
+            MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
+
+            if (!meshFilter || !meshRenderer)
+                continue;
+
+            GameObject childReplica = new GameObject();
+            childReplica.name = child.name;
+            childReplica.transform.parent = newParent.transform;
+
+            MeshFilter meshFilterReplica = childReplica.AddComponent<MeshFilter>();
+            meshFilterReplica.sharedMesh = meshFilter.sharedMesh;
+
+            MeshRenderer meshRendererReplica = childReplica.AddComponent<MeshRenderer>();
+            meshRendererReplica.sharedMaterials = meshRenderer.sharedMaterials;
+
+            childReplica.transform.SetLocalPositionAndRotation(child.localPosition, child.localRotation);
+            childReplica.transform.localScale = child.localScale;
+
+            //Recursive for grand children
+            if (child.childCount > 0) 
+                CreateRelicaChildren(child, childReplica.transform);
+        }
+    }
+    
+    void CreateReplica()
     {
         //Clear
         for (int i = roomReplica.transform.childCount - 1; i >= 0; i--)
@@ -84,25 +115,12 @@ public class Room : MonoBehaviour
         GameObject holder = new GameObject();
         holder.transform.parent = roomReplica.transform;
 
-        for (int i = 0; i < gameObject.transform.childCount; i++)
-        {
-            Transform child = gameObject.transform.GetChild(i);
-
-            GameObject childReplica = Instantiate(child.gameObject, holder.transform);
-            childReplica.transform.SetLocalPositionAndRotation(child.localPosition, child.localRotation);
-
-            MeshFilter meshFilter = child.GetComponent<MeshFilter>();
-            if (meshFilter.sharedMesh == null)
-            {
-                MeshFilter meshFilterReplica = childReplica.GetComponent<MeshFilter>();
-                meshFilter.sharedMesh = meshFilterReplica.sharedMesh;
-            }
-        }
+        CreateRelicaChildren(gameObject.transform, holder.transform);
 
         holder.transform.localScale = Vector3.one * replicaScale;
         holder.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         holder.hideFlags = HideFlags.HideInHierarchy;
-
+        
         //Debug.Log("Replicate");
     }
 }

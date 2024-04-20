@@ -1,6 +1,4 @@
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
 
 public class RoomReplica : MonoBehaviour
 {
@@ -17,7 +15,21 @@ public class RoomReplica : MonoBehaviour
             return;
        
         room.gameObject.SetActive(attached);
-        room.transform.rotation = transform.rotation;
-        room.transform.position = transform.localPosition * placementScale;
+
+        if (!attached || !GameManager.Instance)
+            return;
+
+        Room centerRoom = GameManager.Instance.centerRoom;
+        Transform pivot = GameManager.Instance.centerPivot;
+        
+        if (!centerRoom || !pivot || room == centerRoom)
+            return;
+
+        Vector3 offset =  centerRoom.transform.position + pivot.position;
+
+        Vector3 localPos = pivot.InverseTransformPoint(transform.position);
+        Vector3 worldPos = pivot.TransformPoint(localPos * placementScale - pivot.localPosition);
+
+        room.transform.SetPositionAndRotation(worldPos, transform.rotation);
     }
 }
