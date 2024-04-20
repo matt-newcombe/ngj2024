@@ -11,6 +11,7 @@ public class MiniRoomManipulator : MonoBehaviour
     public float focusDistPastMouse = 5f;
     [FormerlySerializedAs("holdingOffsetWS")] public Vector3 HoldingOffsetWS = new Vector3(-5f, -5f, 0f);
     
+    public LayerMask mask = -1;
     private MiniRoomController _heldRoom;
     private Vector3 _placeRoomPos;
     private bool _validPlacePos = false;
@@ -86,7 +87,7 @@ public class MiniRoomManipulator : MonoBehaviour
         }
         else
         {
-            Matrix4x4 mat = Matrix4x4.TRS(targetPos, _heldRoom.transform.rotation, _heldRoom.transform.localScale * 0.9f);
+            Matrix4x4 mat = Matrix4x4.TRS(targetPos, _heldRoom.transform.rotation, Vector3.one);
             Graphics.RenderMesh(rp, meshFallback, 0, mat);
         }
     }
@@ -124,7 +125,7 @@ public class MiniRoomManipulator : MonoBehaviour
             if (vecToTarget.magnitude > 5f) continue;
             if (Vector3.Dot(dirToTarget, FirstPersonController.transform.forward) < 0.5f) continue;
             // Check that we can ray cast without hitting anything
-            if (Physics.SphereCast(ray, radius:.125f, maxDistance: vecToTarget.magnitude)) continue;
+            if (!ValidRaycast(ray, vecToTarget)) continue;
             if (!(viewportDistance < bestDist)) continue;
             
             // Store new best placements
@@ -134,6 +135,21 @@ public class MiniRoomManipulator : MonoBehaviour
         }
 
         return foundOne;
+    }
+
+    bool ValidRaycast(Ray ray, Vector3 vecToTarget)
+    {
+        RaycastHit[] hitObjs = Physics.SphereCastAll(ray, radius: .125f, maxDistance: vecToTarget.magnitude, mask);
+
+        if (hitObjs.Length > 0)
+        {
+            foreach (var hitObj in hitObjs)
+            {
+                if (hitObj.transform != _heldRoom.transform) return false;
+            }
+        }
+
+        return true;
     }
     
     void SpinRoom()
