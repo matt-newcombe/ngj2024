@@ -46,4 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   centerPivot: {fileID: 0}
   centerRoom: {fileID: 0}
-  roomPlacementScale: 33.33333
+  roomSize: 30
+  replicaSize: 0.5

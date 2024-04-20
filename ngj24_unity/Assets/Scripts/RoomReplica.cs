@@ -48,7 +48,7 @@ public class RoomReplica : MonoBehaviour
             return;
 
         Vector3 localPos = pivot.InverseTransformPoint(transform.position);
-        Vector3 worldPos = pivot.TransformPoint(localPos * GameManager.Instance.roomPlacementScale - pivot.localPosition);
+        Vector3 worldPos = pivot.TransformPoint(localPos * GameManager.Instance.GetRoomPlacementScale() - pivot.localPosition);
 
         room.transform.SetPositionAndRotation(worldPos, transform.rotation);
     }
