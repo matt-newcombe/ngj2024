@@ -103,6 +103,10 @@ public class Room : MonoBehaviour
         {
             Transform child = target.GetChild(i);
 
+            RoomReplica roomReplica = GetComponent<RoomReplica>();
+            if (roomReplica) 
+                continue;
+
             MeshFilter meshFilter = child.GetComponent<MeshFilter>();
             MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
 
@@ -178,7 +182,7 @@ public class Room : MonoBehaviour
 
                 objectInfo.body.gameObject.SetActive(false);
 
-                Debug.Log("stored  " + colliderInsideRoom.gameObject.name + " in " + gameObject.name);
+                //Debug.Log("stored  " + colliderInsideRoom.gameObject.name + " in " + gameObject.name);
             }
         }
     }
@@ -198,8 +202,7 @@ public class Room : MonoBehaviour
             objectInfo.body.transform.SetPositionAndRotation(worldPos, worldRot);
             objectInfo.body.gameObject.SetActive(true);
 
-            Debug.Log("recover  " + objectInfo.body.gameObject.name + " in " + gameObject.name);
+            //Debug.Log("recover  " + objectInfo.body.gameObject.name + " in " + gameObject.name);
         }
     }
-
 }

@@ -6,7 +6,12 @@ public class RoomReplica : MonoBehaviour
 
     [HideInInspector, SerializeField]
     public Room room;
-    
+
+    private void Awake()
+    {
+        transform.parent = null;
+    }
+
     private void Update()
     {
         //TODO replace this, only update when replica has been moved or attached/detached
