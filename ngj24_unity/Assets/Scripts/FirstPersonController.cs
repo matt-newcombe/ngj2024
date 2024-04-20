@@ -264,8 +264,8 @@ namespace StarterAssets
         {
 			if (currentlyCarrying)
 			{
-				if(Time.time - mouseDownTime > pokeThreshold) 
-				{
+				//if(Time.time - mouseDownTime > pokeThreshold) 
+				//{
 					//Carry object
 					Vector3 targetPosition = _mainCamera.transform.TransformPoint(carryPosition);
 
@@ -274,14 +274,7 @@ namespace StarterAssets
 
 					Vector3 angularFrictionForce = -currentlyCarrying.angularVelocity * carryAngularFriction * Time.deltaTime;
 					currentlyCarrying.AddTorque(angularFrictionForce, ForceMode.Force);
-				}
-			}
-            else 
-			{
-				if (isMouseDown)
-				{
-					
-				}
+				//}
 			}
 		}
 
@@ -321,6 +314,10 @@ namespace StarterAssets
 
 		private void Move()
 		{
+			//no movement while rotating room
+			if (Input.GetMouseButton(1))
+				return;
+
 			// set target speed based on move speed, sprint speed and if sprint is pressed
 			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 

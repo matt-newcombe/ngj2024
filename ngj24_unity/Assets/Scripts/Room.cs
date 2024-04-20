@@ -11,13 +11,31 @@ public class Room : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        bool changeDetected = false;
+
         //Validate
         if (roomReplica == null)
         {
             GameObject newRoomReplica = new GameObject();
             roomReplica = newRoomReplica.AddComponent<RoomReplica>();
             roomReplica.room = this;
+
+            Rigidbody newRigidbody = newRoomReplica.AddComponent<Rigidbody>();
+            newRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+
+            newRoomReplica.AddComponent<BoxCollider>();
+
+            MiniRoomController newController = newRoomReplica.AddComponent<MiniRoomController>();
+            //newController.vecSpring.Init(newRoomReplica.transform.position);
+            //newController.vecSpring.SetHalfLife(0.5f);
+                
+            Interactable newInteractable = newRoomReplica.AddComponent<Interactable>();
+
+            changeDetected = true;
         }
+
+        if (roomReplica.TryGetComponent(out BoxCollider collider))
+            collider.size = Vector3.one * roomSize * replicaScale;
 
         roomReplica.gameObject.name = gameObject.name + "Replica";
 
@@ -34,7 +52,6 @@ public class Room : MonoBehaviour
         }
         
         //Check for child count differences for all rooms
-        bool changeDetected = false;
         if (roomReplica.transform.childCount > 0)
         {
             Transform holder = roomReplica.transform.GetChild(0);

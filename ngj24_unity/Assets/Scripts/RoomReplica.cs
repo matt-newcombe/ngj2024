@@ -3,7 +3,7 @@ using UnityEngine;
 public class RoomReplica : MonoBehaviour
 {
     public bool attached;    
-    public int placementScale = 20;
+    public float placementScale = 20;
 
     [HideInInspector, SerializeField]
     public Room room;
@@ -22,13 +22,20 @@ public class RoomReplica : MonoBehaviour
 
     public void UpdateRoom()
     {
-        if (!room)
+        if (!room || !GameManager.Instance)
             return;
 
-        room.gameObject.SetActive(attached);
+        if (Application.isPlaying) 
+        {
+            room.gameObject.SetActive(attached);
 
-        if (!attached || !GameManager.Instance)
-            return;
+            if (!attached)
+                return;
+        }
+        else
+        {
+            room.gameObject.SetActive(true);
+        }
 
         Room centerRoom = GameManager.Instance.centerRoom;
         Transform pivot = GameManager.Instance.centerPivot;

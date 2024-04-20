@@ -16,6 +16,7 @@ public class MiniRoomManipulator : MonoBehaviour
     private bool _validPlacePos = false;
 
     public Material HighlightRenderMaterial;
+    public Mesh meshFallback;
 
     void Start()
     {
@@ -75,8 +76,19 @@ public class MiniRoomManipulator : MonoBehaviour
     void HighlightBestPos(Vector3 targetPos)
     {
         RenderParams rp = new RenderParams(HighlightRenderMaterial);
-        Matrix4x4 mat = Matrix4x4.TRS(targetPos, _heldRoom.transform.rotation, _heldRoom.transform.localScale);
-        Graphics.RenderMesh(rp, _heldRoom.GetComponent<MeshFilter>().sharedMesh, 0, mat);
+
+        MeshFilter roomMeshFilter = _heldRoom.GetComponent<MeshFilter>();
+
+        if (roomMeshFilter)
+        {
+            Matrix4x4 mat = Matrix4x4.TRS(targetPos, _heldRoom.transform.rotation, _heldRoom.transform.localScale);
+            Graphics.RenderMesh(rp, roomMeshFilter.sharedMesh, 0, mat);
+        }
+        else
+        {
+            Matrix4x4 mat = Matrix4x4.TRS(targetPos, _heldRoom.transform.rotation, _heldRoom.transform.localScale * 0.9f);
+            Graphics.RenderMesh(rp, meshFallback, 0, mat);
+        }
     }
 
     bool FindValidSpaceToPlaceIn(out Vector3 bestPosVP)
