@@ -11,9 +11,8 @@ public class MiniRoomManipulator : MonoBehaviour
     public float focusDistPastMouse = 5f;
     [FormerlySerializedAs("holdingOffsetWS")] public Vector3 HoldingOffsetWS = new Vector3(-5f, -5f, 0f);
     
-    private MiniRoomController _room;
+    private MiniRoomController _heldRoom;
     private Vector3 _placeRoomPos;
-    private bool _holding = false;
     private bool _validPlacePos = false;
 
     public Material HighlightRenderMaterial;
@@ -26,26 +25,30 @@ public class MiniRoomManipulator : MonoBehaviour
 
     private void PickedUpCarryable(Interactable obj)
     {
-        if (obj.TryGetComponent(out MiniRoomController miniRoom))
+        bool isMiniRoom = obj.TryGetComponent(out MiniRoomController miniRoom);
+        bool isNotPinnedRoom = obj.transform != GridController.PinnedRoom;
+        
+        if (isMiniRoom && isNotPinnedRoom)
         {
-            if (miniRoom.transform == GridController.PinnedRoom) return;
-            
-            _holding = true;
+            // Remove it from evaluating open spaces
+            GridController.MiniRooms.Remove(miniRoom);
             miniRoom.StartCarry();
             miniRoom.GetComponent<Rigidbody>().isKinematic = false;
             
             _placeRoomPos = miniRoom.transform.position;
-            _room = miniRoom;
+            _heldRoom = miniRoom;
         }
     }
 
     private void DroppedCarryable(Interactable obj)
     {
         if (obj.TryGetComponent(out MiniRoomController miniRoom)
-            && _holding
+            && _heldRoom
             && obj.transform == miniRoom.transform)
         {
-            _holding = false;
+            GridController.MiniRooms.Remove(miniRoom);
+
+            _heldRoom = null;
             miniRoom.StopCarry();
             if (_validPlacePos)
             {
@@ -57,7 +60,10 @@ public class MiniRoomManipulator : MonoBehaviour
 
     void Update()
     {
-        if (!_holding) return;
+        if (!_heldRoom) return;
+
+        SpinRoom();
+        
         _validPlacePos = FindValidSpaceToPlaceIn(out Vector3 placedPos);
         if (_validPlacePos)
         {
@@ -69,8 +75,8 @@ public class MiniRoomManipulator : MonoBehaviour
     void HighlightBestPos(Vector3 targetPos)
     {
         RenderParams rp = new RenderParams(HighlightRenderMaterial);
-        Matrix4x4 mat = Matrix4x4.TRS(targetPos, _room.transform.rotation, _room.transform.localScale);
-        Graphics.RenderMesh(rp, _room.GetComponent<MeshFilter>().sharedMesh, 0, mat);
+        Matrix4x4 mat = Matrix4x4.TRS(targetPos, _heldRoom.transform.rotation, _heldRoom.transform.localScale);
+        Graphics.RenderMesh(rp, _heldRoom.GetComponent<MeshFilter>().sharedMesh, 0, mat);
     }
 
     bool FindValidSpaceToPlaceIn(out Vector3 bestPosVP)
@@ -120,37 +126,40 @@ public class MiniRoomManipulator : MonoBehaviour
     
     void SpinRoom()
     {
-        // Roll
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetMouseButton(1))
         {
-            _room.PushRoll();
-        }
+            // Roll
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                _heldRoom.PushRoll();
+            }
         
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            _room.PullRoll();
-        }
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                _heldRoom.PullRoll();
+            }
         
-        // Pitch
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            _room.PushPitch();
-        }
+            // Pitch
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                _heldRoom.PushPitch();
+            }
         
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            _room.PullPitch();
-        }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                _heldRoom.PullPitch();
+            }
         
-        // Yaw
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            _room.PushYaw();
-        }
+            // Yaw
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                _heldRoom.PushYaw();
+            }
         
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            _room.PullYaw();
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                _heldRoom.PullYaw();
+            } 
         }
     }
 }
