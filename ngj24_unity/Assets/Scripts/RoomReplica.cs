@@ -6,7 +6,12 @@ public class RoomReplica : MonoBehaviour
 
     [HideInInspector, SerializeField]
     public Room room;
-    
+
+    private void Awake()
+    {
+        transform.parent = null;
+    }
+
     private void Update()
     {
         //TODO replace this, only update when replica has been moved or attached/detached
@@ -24,23 +29,6 @@ public class RoomReplica : MonoBehaviour
         if (!room || !GameManager.Instance)
             return;
 
-        if (Application.isPlaying) 
-        {
-            MiniRoomController controller = GetComponent<MiniRoomController>();
-
-            if (controller) 
-            {
-                room.gameObject.SetActive(controller.Placed);
-
-                if (!controller.Placed)
-                    return;
-            }
-        }
-        else
-        {
-            room.gameObject.SetActive(true);
-        }
-
         Room centerRoom = GameManager.Instance.centerRoom;
         Transform pivot = GameManager.Instance.centerPivot;
 
@@ -51,5 +39,29 @@ public class RoomReplica : MonoBehaviour
         Vector3 worldPos = pivot.TransformPoint(localPos * GameManager.Instance.GetRoomPlacementScale() - pivot.localPosition);
 
         room.transform.SetPositionAndRotation(worldPos, transform.rotation);
+
+        if (Application.isPlaying)
+        {
+            MiniRoomController controller = GetComponent<MiniRoomController>();
+
+            if (controller)
+            {
+                bool isInPlace = controller.IsInPlace();
+
+                if (room.gameObject.activeSelf != isInPlace)
+                {
+                    if (isInPlace)
+                        room.RecoverObjectInfo();
+                    else
+                        room.StoreObjectInfo();
+
+                    room.gameObject.SetActive(isInPlace);
+                }
+            }
+        }
+        else
+        {
+            room.gameObject.SetActive(true);
+        }
     }
 }

@@ -52,11 +52,14 @@ public class MiniRoomManipulator : MonoBehaviour
             GridController.MiniRooms.Add(miniRoom);
 
             _heldRoom = null;
-            miniRoom.StopCarry();
             if (_validPlacePos)
             {
                 miniRoom.GetComponent<Rigidbody>().isKinematic = true;
                 miniRoom.DropInPlace(_placeRoomPos);
+            }
+            else
+            {
+                miniRoom.StopCarry();
             }
         }
     }

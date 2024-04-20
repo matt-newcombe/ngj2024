@@ -1,13 +1,38 @@
 using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Room : MonoBehaviour
 {
     [HideInInspector, SerializeField]
     private RoomReplica roomReplica;
 
+    struct ObjectInfo
+    {
+        public Rigidbody body;
+        public Vector3 localPos;
+        public Quaternion localRot;
+    }
+
+    List<ObjectInfo> objectsInside = new List<ObjectInfo>();
+
     void OnDrawGizmos()
     {
+        //Bounds
+        Gizmos.color = Color.green;
+        Gizmos.matrix = transform.localToWorldMatrix;
+        Gizmos.DrawWireCube(Vector3.zero, Vector3.one * GameManager.Instance.roomSize);
+
+        if (roomReplica != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.matrix = roomReplica.transform.localToWorldMatrix;
+            Gizmos.DrawWireCube(Vector3.zero, Vector3.one * GameManager.Instance.replicaSize);
+        }
+
+        if (Application.isPlaying)
+            return;
+
         bool changeDetected = false;
 
         //Validate
@@ -33,23 +58,10 @@ public class Room : MonoBehaviour
             changeDetected = true;
         }
 
-
         if (roomReplica.TryGetComponent(out BoxCollider collider))
             collider.size = Vector3.one * GameManager.Instance.replicaSize;
         
         roomReplica.gameObject.name = gameObject.name + "Replica";
-
-        //Bounds
-        Gizmos.color = Color.green;
-        Gizmos.matrix = transform.localToWorldMatrix;
-        Gizmos.DrawWireCube(Vector3.zero, Vector3.one * GameManager.Instance.roomSize);
-
-        if(roomReplica != null) 
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.matrix = roomReplica.transform.localToWorldMatrix;
-            Gizmos.DrawWireCube(Vector3.zero, Vector3.one * GameManager.Instance.replicaSize);
-        }
         
         //Check for child count differences for all rooms
         if (roomReplica.transform.childCount > 0)
@@ -59,10 +71,10 @@ public class Room : MonoBehaviour
             if (Mathf.Approximately(holder.localScale.x, replicaScale) == false)
                 changeDetected = true;
 
-            if (holder.childCount != transform.childCount)
-                changeDetected = true;
+            //if (holder.childCount != transform.childCount)
+            //    changeDetected = true;
         }
-
+        
         //Check for transform changes for selected room
         if (Selection.activeTransform)
         { 
@@ -90,6 +102,10 @@ public class Room : MonoBehaviour
         for (int i = 0; i < target.childCount; i++)
         {
             Transform child = target.GetChild(i);
+
+            RoomReplica roomReplica = GetComponent<RoomReplica>();
+            if (roomReplica) 
+                continue;
 
             MeshFilter meshFilter = child.GetComponent<MeshFilter>();
             MeshRenderer meshRenderer = child.GetComponent<MeshRenderer>();
@@ -141,5 +157,52 @@ public class Room : MonoBehaviour
         holder.hideFlags = HideFlags.HideInHierarchy;
             
         //Debug.Log("Replicate "+gameObject.name);
+    }
+
+    public void StoreObjectInfo()
+    {
+        objectsInside.Clear();
+
+        Collider[] collidersInsideRoom = Physics.OverlapBox(transform.position, Vector3.one * GameManager.Instance.roomSize * 0.5f, transform.rotation);
+
+        for (int i = 0; i < collidersInsideRoom.Length; i++)
+        {
+            Collider colliderInsideRoom = collidersInsideRoom[i];
+            Rigidbody attachedRigidbody = colliderInsideRoom.attachedRigidbody;
+            if (attachedRigidbody)
+            {
+                ObjectInfo objectInfo = new ObjectInfo();
+
+                objectInfo.body = attachedRigidbody;
+
+                objectInfo.localPos = transform.InverseTransformPoint(attachedRigidbody.transform.position);
+                objectInfo.localRot = Quaternion.Inverse(transform.rotation) * attachedRigidbody.transform.rotation;
+
+                objectsInside.Add(objectInfo);
+
+                objectInfo.body.gameObject.SetActive(false);
+
+                //Debug.Log("stored  " + colliderInsideRoom.gameObject.name + " in " + gameObject.name);
+            }
+        }
+    }
+
+    public void RecoverObjectInfo()
+    {
+        for (int i = 0; i < objectsInside.Count; i++)
+        {
+            ObjectInfo objectInfo = objectsInside[i];
+
+            if (!objectInfo.body)
+                continue;
+
+            Vector3 worldPos = transform.TransformPoint(objectInfo.localPos);
+            Quaternion worldRot = transform.rotation * objectInfo.localRot;
+
+            objectInfo.body.transform.SetPositionAndRotation(worldPos, worldRot);
+            objectInfo.body.gameObject.SetActive(true);
+
+            //Debug.Log("recover  " + objectInfo.body.gameObject.name + " in " + gameObject.name);
+        }
     }
 }
