@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
-    public float roomSize = 30f;
-    public float replicaScale = 0.05f;
-
     [HideInInspector, SerializeField]
     private RoomReplica roomReplica;
 
@@ -36,27 +33,29 @@ public class Room : MonoBehaviour
             changeDetected = true;
         }
 
-        if (roomReplica.TryGetComponent(out BoxCollider collider))
-            collider.size = Vector3.one * roomSize * replicaScale;
 
+        if (roomReplica.TryGetComponent(out BoxCollider collider))
+            collider.size = Vector3.one * GameManager.Instance.replicaSize;
+        
         roomReplica.gameObject.name = gameObject.name + "Replica";
 
         //Bounds
         Gizmos.color = Color.green;
         Gizmos.matrix = transform.localToWorldMatrix;
-        Gizmos.DrawWireCube(Vector3.zero, Vector3.one * roomSize);
+        Gizmos.DrawWireCube(Vector3.zero, Vector3.one * GameManager.Instance.roomSize);
 
         if(roomReplica != null) 
         {
             Gizmos.color = Color.yellow;
             Gizmos.matrix = roomReplica.transform.localToWorldMatrix;
-            Gizmos.DrawWireCube(Vector3.zero, Vector3.one * roomSize * replicaScale);
+            Gizmos.DrawWireCube(Vector3.zero, Vector3.one * GameManager.Instance.replicaSize);
         }
         
         //Check for child count differences for all rooms
         if (roomReplica.transform.childCount > 0)
         {
             Transform holder = roomReplica.transform.GetChild(0);
+            float replicaScale = GameManager.Instance.GetReplicaScale();
             if (Mathf.Approximately(holder.localScale.x, replicaScale) == false)
                 changeDetected = true;
 
@@ -81,7 +80,7 @@ public class Room : MonoBehaviour
                 }
             }
         }
-
+        
         if (changeDetected)
             CreateReplica();
     }
@@ -135,11 +134,12 @@ public class Room : MonoBehaviour
         holder.transform.parent = roomReplica.transform;
 
         CreateRelicaChildren(gameObject.transform, holder.transform);
-
+        
+        float replicaScale = GameManager.Instance.GetReplicaScale();
         holder.transform.localScale = Vector3.one * replicaScale;
         holder.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         holder.hideFlags = HideFlags.HideInHierarchy;
-        
-        //Debug.Log("Replicate");
+            
+        //Debug.Log("Replicate "+gameObject.name);
     }
 }

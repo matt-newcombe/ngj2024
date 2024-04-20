@@ -4,8 +4,10 @@ using System.Linq;
 
 public class GridController : MonoBehaviour
 {
-    public float GridSizeMetres = 1;
-    public int MaxGridSize = 4;
+    public float GridSizeMetres => GameManager.Instance.replicaSize;
+    public int MaxBlockCount = 4;
+    public float MaxGridSize => MaxBlockCount * GridSizeMetres;
+    
     public Vector3 ManualGridOffset;
 
     public List<MiniRoomController> MiniRooms;
@@ -77,6 +79,11 @@ public class GridController : MonoBehaviour
         }
 
         return closedPositions;
+    }
+
+    private void Update()
+    {
+        PinnedRoom.localScale = Vector3.one * GameManager.Instance.replicaSize;
     }
 
     void OnDrawGizmos()

@@ -87,7 +87,7 @@ public class MiniRoomManipulator : MonoBehaviour
         }
         else
         {
-            Matrix4x4 mat = Matrix4x4.TRS(targetPos, _heldRoom.transform.rotation, Vector3.one);
+            Matrix4x4 mat = Matrix4x4.TRS(targetPos, _heldRoom.transform.rotation, Vector3.one * GameManager.Instance.replicaSize);
             Graphics.RenderMesh(rp, meshFallback, 0, mat);
         }
     }
