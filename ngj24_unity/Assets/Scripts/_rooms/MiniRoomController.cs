@@ -1,3 +1,4 @@
+using System;
 using UnityEditor.Rendering;
 using UnityEngine;
 
@@ -7,6 +8,10 @@ public class MiniRoomController : MonoBehaviour
     private Quaternion _currentRotation = Quaternion.identity;
     private Quaternion _goalRotation = Quaternion.identity;
 
+    private void Start()
+    {
+        _currentRotation = _goalRotation = transform.rotation;
+    }
 
     void Update()
     {
