@@ -1,11 +1,12 @@
 using System;
 using UnityEngine;
 
+
 [Serializable]
 public class VecSpringDamp
 {
     [Range(1f, 20.0f)]
-    public float Frequency = 1f;
+    public float Frequency = 2f;
     [Range(0.01f, 20.0f)]
     public float HalfLife = 1f;
     
@@ -43,6 +44,11 @@ public class VecSpringDamp
         );
     }
 
+    public Vector3 Pos()
+    {
+        return new Vector3(x.Pos(), y.Pos(), z.Pos());
+    }
+
     public void SetFrequency(float frequency)
     {
         Frequency = frequency;
@@ -75,6 +81,11 @@ public class FloatSpringDamp
         x = pos;
     }
 
+    public float Pos()
+    {
+        return x;
+    }
+
     public float MoveTowards(float goal, float goalVelocity)
     {
         damper_spring(goal, goalVelocity, Frequency, HalfLife, Time.fixedDeltaTime);
@@ -100,7 +111,7 @@ public class FloatSpringDamp
         float c = g + (d * q) / (s + Mathf.Epsilon);
         float y = d / 2.0f;
 
-        if (Mathf.Abs(s - (d * d) / 4.0f) < Mathf.Epsilon) // Critically Damped
+      //  if (Mathf.Abs(s - (d * d) / 4.0f) < Mathf.Epsilon) // Critically Damped
         {
             float j0 = x - c;
             float j1 = v + j0 * y;
@@ -110,32 +121,32 @@ public class FloatSpringDamp
             x = j0 * eydt + dt * j1 * eydt + c;
             v = -y * j0 * eydt - y * dt * j1 * eydt + j1 * eydt;
         }
-        else if (s - (d * d) / 4.0f > 0.0) // Under Damped
-        {
-            float w = Mathf.Sqrt(s - (d * d) / 4.0f);
-            float j = Mathf.Sqrt(squaref(v + y * (x - c)) / (w * w + Mathf.Epsilon) + squaref(x - c));
-            float p = Mathf.Atan((v + (x - c) * y) / (-(x - c) * w + Mathf.Epsilon));
-
-            j = (x - c) > 0.0f ? j : -j;
-
-            float eydt = fast_negexp(y * dt);
-
-            x = j * eydt * Mathf.Cos(w * dt + p) + c;
-            v = -y * j * eydt * Mathf.Cos(w * dt + p) - w * j * eydt * Mathf.Sin(w * dt + p);
-        }
-        else if (s - (d * d) / 4.0f < 0.0) // Over Damped
-        {
-            float y0 = (d + Mathf.Sqrt(d * d - 4 * s)) / 2.0f;
-            float y1 = (d - Mathf.Sqrt(d * d - 4 * s)) / 2.0f;
-            float j1 = (c * y0 - x * y0 - v) / (y1 - y0);
-            float j0 = x - j1 - c;
-
-            float ey0dt = fast_negexp(y0 * dt);
-            float ey1dt = fast_negexp(y1 * dt);
-
-            x = j0 * ey0dt + j1 * ey1dt + c;
-            v = -y0 * j0 * ey0dt - y1 * j1 * ey1dt;
-        }
+        // else if (s - (d * d) / 4.0f > 0.0) // Under Damped
+        // {
+        //     float w = Mathf.Sqrt(s - (d * d) / 4.0f);
+        //     float j = Mathf.Sqrt(squaref(v + y * (x - c)) / (w * w + Mathf.Epsilon) + squaref(x - c));
+        //     float p = Mathf.Atan((v + (x - c) * y) / (-(x - c) * w + Mathf.Epsilon));
+        //
+        //     j = (x - c) > 0.0f ? j : -j;
+        //
+        //     float eydt = fast_negexp(y * dt);
+        //
+        //     x = j * eydt * Mathf.Cos(w * dt + p) + c;
+        //     v = -y * j * eydt * Mathf.Cos(w * dt + p) - w * j * eydt * Mathf.Sin(w * dt + p);
+        // }
+        // else if (s - (d * d) / 4.0f < 0.0) // Over Damped
+        // {
+        //     float y0 = (d + Mathf.Sqrt(d * d - 4 * s)) / 2.0f;
+        //     float y1 = (d - Mathf.Sqrt(d * d - 4 * s)) / 2.0f;
+        //     float j1 = (c * y0 - x * y0 - v) / (y1 - y0);
+        //     float j0 = x - j1 - c;
+        //
+        //     float ey0dt = fast_negexp(y0 * dt);
+        //     float ey1dt = fast_negexp(y1 * dt);
+        //
+        //     x = j0 * ey0dt + j1 * ey1dt + c;
+        //     v = -y0 * j0 * ey0dt - y1 * j1 * ey1dt;
+        // }
     }
 
     //--------------------------------------------------------------------

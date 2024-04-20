@@ -61,6 +61,8 @@ namespace StarterAssets
 		public float carryForce;
 		public float carryAngularFriction;
 		public float maxThrowVelocity;
+		public Action<Interactable> DroppedCarryable;
+		public Action<Interactable> PickedUpCarryable;
 
 		[Header("Poke")]
 		public float pokeForce = 0.2f;
@@ -163,25 +165,21 @@ namespace StarterAssets
 					break;
 				}
             }
-
+			
 			if (value.isPressed)
 			{
 				mouseDownTime = Time.time;
+
 				isMouseDown = true;
-            }
+			}
             else
             {
 				isMouseDown = false;
-
-				//Drop Object
+			
 				if (currentlyCarrying)
-				{
-					currentlyCarrying.useGravity = carryingPreviousGravity;
-					currentlyCarrying.angularDamping = carryingPreviousAngularDrag;
-
-					currentlyCarrying.linearVelocity = Vector3.ClampMagnitude(currentlyCarrying.linearVelocity, maxThrowVelocity);
-					currentlyCarrying = null;
-				}
+					DropObject();
+				else
+					PickupCheck();
 			}
 
 			if (currentInteractable != null)
@@ -193,20 +191,65 @@ namespace StarterAssets
 				else
 				{
 					//Poke
-					if (Time.time - mouseDownTime < pokeThreshold) 
-					{
-						currentInteractable.PokeInteraction();
+					//if (Time.time - mouseDownTime < pokeThreshold) 
+					//{
+					//	currentInteractable.PokeInteraction();
 
-						Vector3 origin = _mainCamera.transform.position;
-						Vector3 direction = _mainCamera.transform.forward;
-						if (Physics.Raycast(origin, direction, out RaycastHit hit, pickupDistance, pickupLayerMask, QueryTriggerInteraction.Ignore))
-						{
-							Rigidbody attachedRigidbody = hit.collider.attachedRigidbody;
-							if (attachedRigidbody)
-								attachedRigidbody.AddForceAtPosition(direction * pokeForce, hit.point, ForceMode.Impulse);
-						}
-					}
+					//	Vector3 origin = _mainCamera.transform.position;
+					//	Vector3 direction = _mainCamera.transform.forward;
+					//	if (Physics.Raycast(origin, direction, out RaycastHit hit, pickupDistance, pickupLayerMask, QueryTriggerInteraction.Ignore))
+					//	{
+					//		Rigidbody attachedRigidbody = hit.collider.attachedRigidbody;
+					//		if (attachedRigidbody)
+					//			attachedRigidbody.AddForceAtPosition(direction * pokeForce, hit.point, ForceMode.Impulse);
+					//	}
+					//}
 				}
+			}
+		}
+
+		private void PickupCheck()
+		{
+			Vector3 origin = _mainCamera.transform.position;
+			Vector3 direction = _mainCamera.transform.forward;
+
+			if (Physics.Raycast(origin, direction, out RaycastHit hit, pickupDistance, pickupLayerMask, QueryTriggerInteraction.Ignore))
+			{
+				Rigidbody attachedRigidbody = hit.collider.attachedRigidbody;
+				Pickup(attachedRigidbody);
+			}
+		}
+
+		private void Pickup(Rigidbody target)
+		{
+			if (!target)
+				return;
+
+			currentlyCarrying = target;
+			carryingPreviousGravity = currentlyCarrying.useGravity;
+			carryingPreviousAngularDrag = currentlyCarrying.angularDamping;
+
+			Interactable interactable = target.GetComponent<Interactable>();
+			if (interactable) 
+			{
+				interactable.StartCarry();
+				PickedUpCarryable?.Invoke(interactable);
+			}
+
+			currentlyCarrying.useGravity = false;
+			currentlyCarrying.angularDamping = 2.25f;
+		}
+
+		private void DropObject()
+		{
+			if (currentlyCarrying)
+			{
+				currentlyCarrying.useGravity = carryingPreviousGravity;
+				currentlyCarrying.angularDamping = carryingPreviousAngularDrag;
+
+				currentlyCarrying.linearVelocity = Vector3.ClampMagnitude(currentlyCarrying.linearVelocity, maxThrowVelocity);
+				DroppedCarryable?.Invoke(currentlyCarrying.GetComponent<Interactable>());
+				currentlyCarrying = null;
 			}
 		}
 
@@ -216,13 +259,13 @@ namespace StarterAssets
 			GroundedCheck();
 			Move();
 		}
-
+		
         private void FixedUpdate()
         {
 			if (currentlyCarrying)
 			{
-				if(Time.time - mouseDownTime > pokeThreshold) 
-				{
+				//if(Time.time - mouseDownTime > pokeThreshold) 
+				//{
 					//Carry object
 					Vector3 targetPosition = _mainCamera.transform.TransformPoint(carryPosition);
 
@@ -231,35 +274,7 @@ namespace StarterAssets
 
 					Vector3 angularFrictionForce = -currentlyCarrying.angularVelocity * carryAngularFriction * Time.deltaTime;
 					currentlyCarrying.AddTorque(angularFrictionForce, ForceMode.Force);
-				}
-			}
-            else 
-			{
-				if (isMouseDown)
-				{
-					//Pickup Object
-					Vector3 origin = _mainCamera.transform.position;
-					Vector3 direction = _mainCamera.transform.forward;
-					
-					if (Physics.Raycast(origin, direction, out RaycastHit hit, pickupDistance, pickupLayerMask, QueryTriggerInteraction.Ignore))
-					{
-						Rigidbody attachedRigidbody = hit.collider.attachedRigidbody;
-
-						if (attachedRigidbody)
-						{
-							currentlyCarrying = attachedRigidbody;
-							carryingPreviousGravity = currentlyCarrying.useGravity;
-							carryingPreviousAngularDrag = currentlyCarrying.angularDamping;
-
-                            Interactable interactable = attachedRigidbody.GetComponent<Interactable>();
-                            if (interactable) 
-								interactable.StartCarry();
-
-							currentlyCarrying.useGravity = false;
-							currentlyCarrying.angularDamping = 2.25f;
-						}
-					}
-				}
+				//}
 			}
 		}
 
@@ -299,6 +314,10 @@ namespace StarterAssets
 
 		private void Move()
 		{
+			//no movement while rotating room
+			if (Input.GetMouseButton(1))
+				return;
+
 			// set target speed based on move speed, sprint speed and if sprint is pressed
 			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
