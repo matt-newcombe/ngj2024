@@ -14,8 +14,8 @@ public class Stars : MonoBehaviour
     public float sizeMax;
 
     [Space]
-    bool randomRotation;
-    bool faceCenter;
+    public bool randomRotation;
+    public bool faceCenter;
 
     void Awake()
     {
