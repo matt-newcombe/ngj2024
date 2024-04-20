@@ -15,7 +15,7 @@ public class GridController : MonoBehaviour
 
     void Awake()
     {
-        MiniRooms = FindObjectsByType<MiniRoomController>(FindObjectsSortMode.None).ToList();
+        MiniRooms = FindObjectsByType<MiniRoomController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).ToList();
     }
     
     public List<Vector3> FindAllOpenPositions()
