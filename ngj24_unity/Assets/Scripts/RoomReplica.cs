@@ -2,12 +2,11 @@ using UnityEngine;
 
 public class RoomReplica : MonoBehaviour
 {
-    public bool attached;    
     public float placementScale = 20;
 
     [HideInInspector, SerializeField]
     public Room room;
-
+    
     private void Update()
     {
         //TODO replace this, only update when replica has been moved or attached/detached
@@ -27,10 +26,15 @@ public class RoomReplica : MonoBehaviour
 
         if (Application.isPlaying) 
         {
-            room.gameObject.SetActive(attached);
+            MiniRoomController controller = GetComponent<MiniRoomController>();
 
-            if (!attached)
-                return;
+            if (controller) 
+            {
+                room.gameObject.SetActive(controller.Placed);
+
+                if (!controller.Placed)
+                    return;
+            }
         }
         else
         {

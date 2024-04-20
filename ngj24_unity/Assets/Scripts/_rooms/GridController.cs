@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class GridController : MonoBehaviour
 {
@@ -12,9 +13,9 @@ public class GridController : MonoBehaviour
 
     public bool DebugShowGrid = false;
 
-    void Start()
+    void Awake()
     {
-        
+        MiniRooms = FindObjectsByType<MiniRoomController>(FindObjectsSortMode.None).ToList();
     }
     
     public List<Vector3> FindAllOpenPositions()
