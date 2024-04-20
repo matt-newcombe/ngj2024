@@ -61,6 +61,8 @@ namespace StarterAssets
 		public float carryForce;
 		public float carryAngularFriction;
 		public float maxThrowVelocity;
+		public Action<Interactable> DroppedCarryable;
+		public Action<Interactable> PickedUpCarryable;
 
 		[Header("Poke")]
 		public float pokeForce = 0.2f;
@@ -228,8 +230,11 @@ namespace StarterAssets
 			carryingPreviousAngularDrag = currentlyCarrying.angularDamping;
 
 			Interactable interactable = target.GetComponent<Interactable>();
-			if (interactable)
+			if (interactable) 
+			{
 				interactable.StartCarry();
+				PickedUpCarryable?.Invoke(interactable);
+			}
 
 			currentlyCarrying.useGravity = false;
 			currentlyCarrying.angularDamping = 2.25f;
@@ -243,6 +248,7 @@ namespace StarterAssets
 				currentlyCarrying.angularDamping = carryingPreviousAngularDrag;
 
 				currentlyCarrying.linearVelocity = Vector3.ClampMagnitude(currentlyCarrying.linearVelocity, maxThrowVelocity);
+				DroppedCarryable?.Invoke(currentlyCarrying.GetComponent<Interactable>());
 				currentlyCarrying = null;
 			}
 		}
@@ -253,7 +259,7 @@ namespace StarterAssets
 			GroundedCheck();
 			Move();
 		}
-
+		
         private void FixedUpdate()
         {
 			if (currentlyCarrying)

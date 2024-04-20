@@ -6,9 +6,9 @@ using UnityEngine;
 public class VecSpringDamp
 {
     [Range(1f, 20.0f)]
-    public float Frequency = 1f;
+    public float Frequency = 2f;
     [Range(0.01f, 20.0f)]
-    public float HalfLife = 0.01f;
+    public float HalfLife = 1f;
     
     private FloatSpringDamp x;
     private FloatSpringDamp y;
