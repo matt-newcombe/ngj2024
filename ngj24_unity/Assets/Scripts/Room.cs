@@ -138,6 +138,8 @@ public class Room : MonoBehaviour
         for (int i = roomReplica.transform.childCount - 1; i >= 0; i--)
         {
             Transform child = roomReplica.transform.GetChild(i);
+            
+            if (child.GetComponent<ReplicaDoNotDestroy>()) continue;
 
             if (Application.isPlaying)
                 Destroy(child.gameObject);
