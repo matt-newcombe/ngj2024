@@ -75,6 +75,7 @@ public class Room : MonoBehaviour
             //    changeDetected = true;
         }
         
+        #if UNITY_EDITOR
         //Check for transform changes for selected room
         if (Selection.activeTransform)
         { 
@@ -92,6 +93,7 @@ public class Room : MonoBehaviour
                 }
             }
         }
+        #endif
         
         if (changeDetected)
             CreateReplica();
