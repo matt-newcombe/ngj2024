@@ -143,7 +143,7 @@ public class MiniRoomManipulator : MonoBehaviour
 
     bool ValidRaycast(Ray ray, Vector3 vecToTarget)
     {
-        RaycastHit[] hitObjs = Physics.SphereCastAll(ray, radius: .125f, maxDistance: vecToTarget.magnitude, mask);
+        RaycastHit[] hitObjs = Physics.SphereCastAll(ray, radius: .0125f, maxDistance: vecToTarget.magnitude, mask);
 
         if (hitObjs.Length > 0)
         {

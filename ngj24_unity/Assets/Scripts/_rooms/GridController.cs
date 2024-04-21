@@ -93,7 +93,7 @@ public class GridController : MonoBehaviour
         foreach (var openPos in openPositions)
         {
             Gizmos.color = Color.white;
-            Gizmos.DrawWireSphere(openPos, 0.1f);
+            Gizmos.DrawWireSphere(openPos, 0.05f);
         }
 
         if (DebugShowGrid)
@@ -104,7 +104,7 @@ public class GridController : MonoBehaviour
                 {
                     for (float z = -MaxGridSize; z < MaxGridSize; z += GridSizeMetres)
                     {
-                        Gizmos.DrawWireSphere(GridOffset + new Vector3(x,y,z), 0.1f);
+                        Gizmos.DrawWireSphere(GridOffset + new Vector3(x,y,z), 0.05f);
                     }
                 }
             }
