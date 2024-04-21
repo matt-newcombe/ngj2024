@@ -36,6 +36,10 @@ public class MiniRoomManipulator : MonoBehaviour
             GridController.MiniRooms.Remove(miniRoom);
             miniRoom.StartCarry();
             miniRoom.GetComponent<Rigidbody>().isKinematic = false;
+
+            Joint joint = miniRoom.GetComponent<Joint>();
+            if (joint)
+                Destroy(joint);
             
             _placeRoomPos = miniRoom.transform.position;
             _heldRoom = miniRoom;

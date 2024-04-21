@@ -44,7 +44,7 @@ public class RoomReplica : MonoBehaviour
         Vector3 worldPos = pivot.TransformPoint(localPos * GameManager.Instance.GetRoomPlacementScale() - pivot.localPosition);
 
         room.transform.SetPositionAndRotation(worldPos, transform.rotation);
-
+        
         if (Application.isPlaying)
         {
             MiniRoomController controller = GetComponent<MiniRoomController>();
@@ -55,12 +55,12 @@ public class RoomReplica : MonoBehaviour
 
                 if (room.gameObject.activeSelf != isInPlace)
                 {
+                    room.gameObject.SetActive(isInPlace);
+
                     if (isInPlace)
                         room.RecoverObjectInfo();
                     else
                         room.StoreObjectInfo();
-
-                    room.gameObject.SetActive(isInPlace);
                 }
             }
         }

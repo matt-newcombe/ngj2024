@@ -225,11 +225,16 @@ namespace StarterAssets
 			if (!target)
 				return;
 
+			bool isMiniRoom = target.TryGetComponent(out MiniRoomController miniRoom);
+			if (!isMiniRoom)
+				return;
+			
 			currentlyCarrying = target;
 			carryingPreviousGravity = currentlyCarrying.useGravity;
 			carryingPreviousAngularDrag = currentlyCarrying.angularDamping;
 
 			Interactable interactable = target.GetComponent<Interactable>();
+
 			if (interactable) 
 			{
 				interactable.StartCarry();
