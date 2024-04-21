@@ -12,6 +12,11 @@ public class RoomReplica : MonoBehaviour
         transform.parent = null;
     }
 
+    private void OnDisable()
+    {
+        UpdateRoom();
+    }
+
     private void Update()
     {
         //TODO replace this, only update when replica has been moved or attached/detached
