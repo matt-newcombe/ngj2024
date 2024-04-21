@@ -11720,9 +11720,9 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 14
   m_CollisionDetection: 0
 --- !u!1 &5572115395504007379
 GameObject:
@@ -11963,6 +11963,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
         type: 3}
+      propertyPath: m_UseLimits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
+        type: 3}
       propertyPath: m_ConnectedBody
       value: 
       objectReference: {fileID: 5206813771017841979}
@@ -12051,6 +12056,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5187613614713679627}
     m_Modifications:
+    - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
+        type: 3}
+      propertyPath: m_UseLimits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
         type: 3}
       propertyPath: m_ConnectedBody
@@ -12143,6 +12153,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
         type: 3}
+      propertyPath: m_UseLimits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
+        type: 3}
       propertyPath: m_ConnectedBody
       value: 
       objectReference: {fileID: 8335304742926405088}
@@ -12231,6 +12246,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5187613614713679627}
     m_Modifications:
+    - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
+        type: 3}
+      propertyPath: m_UseLimits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
         type: 3}
       propertyPath: m_ConnectedBody
@@ -12323,6 +12343,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
         type: 3}
+      propertyPath: m_UseLimits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
+        type: 3}
       propertyPath: m_ConnectedBody
       value: 
       objectReference: {fileID: 6712418770273170043}
@@ -12413,6 +12438,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
         type: 3}
+      propertyPath: m_UseLimits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
+        type: 3}
       propertyPath: m_ConnectedBody
       value: 
       objectReference: {fileID: 5852145636983680326}
@@ -12501,6 +12531,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5187613614713679627}
     m_Modifications:
+    - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
+        type: 3}
+      propertyPath: m_UseLimits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1797332216981937082, guid: fb8a78cd0087248d691bf85230df637d,
         type: 3}
       propertyPath: m_ConnectedBody
