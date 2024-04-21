@@ -77,7 +77,7 @@ public class MiniRoomController : MonoBehaviour
     private bool CloseToTargetPos()
     {
         float distance = Vector3.Distance(vecSpring.Pos(), _placedPosition);
-        return distance < 0.01f;
+        return distance < 0.008f;
     }
 
     public void PushPitch()
