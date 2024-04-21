@@ -131,7 +131,7 @@ public class MiniRoomManipulator : MonoBehaviour
             float viewportDistance = Vector3.Distance(new Vector3(openPosVP.x, openPosVP.y, 0f), mouseVP);
             
             if (vecToTarget.magnitude > 5f) continue;
-            if (Vector3.Dot(dirToTarget, FirstPersonController.transform.forward) < 0.5f) continue;
+            if (Vector3.Dot(dirToTarget, FirstPersonController.transform.forward) < 0.93f) continue;
             // Check that we can ray cast without hitting anything
             if (!ValidRaycast(ray, vecToTarget)) continue;
             if (!(viewportDistance < bestDist)) continue;
