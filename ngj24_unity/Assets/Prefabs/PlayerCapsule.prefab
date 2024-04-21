@@ -396,5 +396,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   KillHeight: -100
+  SpawnAboveHeight: 7
   controller: {fileID: 8616685848737228371}
-  playerSpawnPos: {x: 0, y: 0, z: 0}

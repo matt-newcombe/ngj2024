@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerKillReset : MonoBehaviour
 {
     public float KillHeight = -100f;
+    public float SpawnAboveHeight = -15f;
     public FirstPersonController controller;
     private Vector3 _playerSpawnPos = Vector3.zero;
     
@@ -27,7 +28,7 @@ public class PlayerKillReset : MonoBehaviour
     {
         controller.GetComponent<CharacterController>().enabled = false;
         yield return null;
-        controller.transform.position = _playerSpawnPos + Vector3.up * 30f;
+        controller.transform.position = _playerSpawnPos + Vector3.up * SpawnAboveHeight;
         yield return null;
         controller.GetComponent<CharacterController>().enabled = true;
     }
