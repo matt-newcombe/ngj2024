@@ -7,6 +7,7 @@ public class Room : MonoBehaviour
     [HideInInspector, SerializeField]
     private RoomReplica roomReplica;
 
+    [System.Serializable]
     struct ObjectInfo
     {
         public Rigidbody body;
@@ -165,30 +166,69 @@ public class Room : MonoBehaviour
 
     public void StoreObjectInfo()
     {
-        objectsInside.Clear();
-
         Collider[] collidersInsideRoom = Physics.OverlapBox(transform.position, Vector3.one * GameManager.Instance.roomSize * 0.5f, transform.rotation);
+
+        //Check for rigidbodies joint to room
+        List<Rigidbody> jointRigidbodies = new List<Rigidbody>();
+        for (int i = 0; i < objectsInside.Count; i++)
+        {
+            ObjectInfo objectInside = objectsInside[i];
+            if (!objectInside.body)
+                continue;
+
+            Joint joint = objectInside.body.GetComponent<Joint>();
+            if (!joint || !joint.connectedBody)
+                continue;
+
+            bool stillInsideRoom = false;
+            for (int s = 0; s < collidersInsideRoom.Length; s++)
+            {
+                Collider colliderInsideRoom = collidersInsideRoom[s];
+                Rigidbody attachedRigidbody = colliderInsideRoom.attachedRigidbody;
+                if (attachedRigidbody && attachedRigidbody == objectInside.body)
+                    stillInsideRoom = true;
+            }
+
+            if (!stillInsideRoom)
+            {
+                Room room = joint.connectedBody.GetComponentInParent<Room>(true);
+                if(room == this)
+                    jointRigidbodies.Add(objectInside.body);
+            }
+        }
+        
+        //Clear
+        objectsInside.Clear();
 
         for (int i = 0; i < collidersInsideRoom.Length; i++)
         {
             Collider colliderInsideRoom = collidersInsideRoom[i];
-            Rigidbody attachedRigidbody = colliderInsideRoom.attachedRigidbody;
-            if (attachedRigidbody)
-            {
-                ObjectInfo objectInfo = new ObjectInfo();
-
-                objectInfo.body = attachedRigidbody;
-
-                objectInfo.localPos = transform.InverseTransformPoint(attachedRigidbody.transform.position);
-                objectInfo.localRot = Quaternion.Inverse(transform.rotation) * attachedRigidbody.transform.rotation;
-
-                objectsInside.Add(objectInfo);
-
-                objectInfo.body.gameObject.SetActive(false);
-
-                //Debug.Log("stored  " + colliderInsideRoom.gameObject.name + " in " + gameObject.name);
-            }
+            StoreObjectInfo(colliderInsideRoom.attachedRigidbody);
         }
+
+        for (int i = 0; i < jointRigidbodies.Count; i++)
+        {
+            StoreObjectInfo(jointRigidbodies[i]);
+        }
+    }
+
+    void StoreObjectInfo(Rigidbody attachedRigidbody)
+    {
+        if (!attachedRigidbody)
+            return; 
+
+        ObjectInfo objectInfo = new ObjectInfo();
+
+        objectInfo.body = attachedRigidbody;
+
+        objectInfo.localPos = transform.InverseTransformPoint(attachedRigidbody.transform.position);
+        objectInfo.localRot = Quaternion.Inverse(transform.rotation) * attachedRigidbody.transform.rotation;
+
+        objectsInside.Add(objectInfo);
+
+        objectInfo.body.gameObject.SetActive(false);
+
+        //Debug.Log("stored  " + colliderInsideRoom.gameObject.name + " in " + gameObject.name);
     }
 
     public void RecoverObjectInfo()

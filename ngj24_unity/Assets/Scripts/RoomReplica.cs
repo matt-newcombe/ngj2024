@@ -41,10 +41,13 @@ public class RoomReplica : MonoBehaviour
             return;
 
         Vector3 localPos = pivot.InverseTransformPoint(transform.position);
-        Vector3 worldPos = pivot.TransformPoint(localPos * GameManager.Instance.GetRoomPlacementScale() - pivot.localPosition);
-
-        room.transform.SetPositionAndRotation(worldPos, transform.rotation);
         
+        Vector3 worldPos = pivot.TransformPoint(localPos * GameManager.Instance.GetRoomPlacementScale() - pivot.localPosition);
+        if(worldPos.magnitude < 10000f)
+            room.transform.position = worldPos;
+        
+        room.transform.rotation = transform.rotation;
+
         if (Application.isPlaying)
         {
             MiniRoomController controller = GetComponent<MiniRoomController>();
